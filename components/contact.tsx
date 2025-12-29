@@ -1,47 +1,57 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
+import { useState } from "react";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     message: "",
-  })
-  const [submitted, setSubmitted] = useState(false)
+  });
+  const [submitted, setSubmitted] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    console.log("Formulario enviado:", formData)
-    setSubmitted(true)
-    setFormData({ name: "", email: "", message: "" })
-    setTimeout(() => setSubmitted(false), 3000)
-  }
+    e.preventDefault();
+    console.log("Formulario enviado:", formData);
+    setSubmitted(true);
+    setFormData({ name: "", email: "", message: "" });
+    setTimeout(() => setSubmitted(false), 3000);
+  };
 
   return (
-    <section id="contact" className="w-full bg-black py-20 md:py-32 px-4 sm:px-6 lg:px-8">
+    <section
+      id="contact"
+      className="w-full bg-black py-20 md:py-32 px-4 sm:px-6 lg:px-8"
+    >
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight text-white">Contacto</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight text-white">
+            Contacto
+          </h2>
           <p className="text-neutral-400 text-lg text-balance">
-            ¿Te gustaría trabajar conmigo o tienes alguna pregunta? Escríbeme y hablamos de tu proyecto.
+            ¿Te gustaría trabajar conmigo o tienes alguna pregunta? Escríbeme y
+            hablamos de tu proyecto.
           </p>
         </div>
-
-        {/* Form */}
+        {/* Form
         <form onSubmit={handleSubmit} className="space-y-6 mb-12">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-neutral-300 mb-2">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-neutral-300 mb-2"
+            >
               Nombre
             </label>
             <input
@@ -57,7 +67,10 @@ const Contact = () => {
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-neutral-300 mb-2">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-neutral-300 mb-2"
+            >
               Email
             </label>
             <input
@@ -73,7 +86,10 @@ const Contact = () => {
           </div>
 
           <div>
-            <label htmlFor="message" className="block text-sm font-medium text-neutral-300 mb-2">
+            <label
+              htmlFor="message"
+              className="block text-sm font-medium text-neutral-300 mb-2"
+            >
               Mensaje
             </label>
             <textarea
@@ -100,14 +116,16 @@ const Contact = () => {
               ¡Mensaje enviado! Me pondré en contacto pronto.
             </div>
           )}
-        </form>
-
+        </form> */}
         {/* Contact Info */}
         <div className="border-t border-neutral-800 pt-12 text-center">
-          <p className="text-neutral-400 mb-6">O contactame directamente en:</p>
-          <p className="text-white text-lg font-semibold mb-8">contacto@martinvillegas.com</p>
+          {/* <p className="text-neutral-400 mb-6">O contactame directamente en:</p> */}
+          <p className="text-neutral-400 mb-6">Contactame directamente en:</p>
+          <p className="text-white text-lg font-semibold mb-8">
+            mvillegasgallery@gmail.com
+          </p>
           <a
-            href="https://instagram.com/mi_usuario"
+            href="https://instagram.com/mvillegas_gallery"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block px-8 py-3 border-2 border-neutral-700 text-neutral-300 font-semibold rounded-lg hover:border-white hover:text-white transition-all duration-300"
@@ -117,7 +135,7 @@ const Contact = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default Contact
+export default Contact;

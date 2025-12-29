@@ -1,36 +1,45 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { X } from "lucide-react"
+import { useState } from "react";
+import { X } from "lucide-react";
 
 interface Photo {
-  id: number
-  query: string
-  alt: string
+  id: number;
+  src: string;
+  alt: string;
 }
 
 const Portfolio = () => {
-  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null)
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
 
   const photos: Photo[] = [
-    { id: 1, query: "mountain landscape photography", alt: "Paisaje montañoso" },
-    { id: 2, query: "city street photography urban", alt: "Fotografía urbana" },
-    { id: 3, query: "portrait photography professional", alt: "Retrato profesional" },
-    { id: 4, query: "nature forest photography", alt: "Fotografía de naturaleza" },
-    { id: 5, query: "travel photography beach", alt: "Fotografía de viaje - playa" },
-    { id: 6, query: "architecture photography building", alt: "Fotografía de arquitectura" },
-    { id: 7, query: "sunset landscape photography", alt: "Fotografía de atardecer" },
-    { id: 8, query: "waterfall nature photography", alt: "Fotografía de cascada" },
-    { id: 9, query: "cityscape night photography", alt: "Fotografía nocturna urbana" },
-  ]
+    { id: 1, src: "/guacamaya.jpg", alt: "Fotografía de fauna" },
+    { id: 2, src: "/ardilla1.jpg", alt: "Fotografía de fauna" },
+    { id: 3, src: "/paisaje-pirineos.jpg", alt: "Fotografía de paisaje" },
+    { id: 4, src: "/perico.jpg", alt: "Fotografía de fauna" },
+    { id: 5, src: "/carpintero.jpg", alt: "Fotografía de fauna" },
+    { id: 6, src: "/kingfisher.jpg", alt: "Fotografía de fauna" },
+    { id: 7, src: "/alcaravan.jpg", alt: "Fotografía de fauna" },
+    { id: 8, src: "/garza.jpg", alt: "Fotografía de fauna" },
+    { id: 9, src: "/cormoranes.jpg", alt: "Fotografía de fauna" },
+    { id: 10, src: "/aguila.jpg", alt: "Fotografía de fauna" },
+    { id: 11, src: "/flamingos.jpg", alt: "Fotografía de fauna" },
+    { id: 12, src: "/pato.jpg", alt: "Fotografía de fauna" },
+  ];
 
   return (
-    <section id="portfolio" className="w-full bg-neutral-900 py-20 md:py-32 px-4 sm:px-6 lg:px-8">
+    <section
+      id="portfolio"
+      className="w-full bg-neutral-900 py-20 md:py-32 px-4 sm:px-6 lg:px-8"
+    >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight text-white">Portfolio</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight text-white">
+            Portfolio
+          </h2>
           <p className="text-neutral-400 text-lg max-w-2xl mx-auto text-balance">
-            Una selección de mis fotos favoritas de viajes, ciudades, retratos y naturaleza.
+            Una selección de mis fotos favoritas de viajes, ciudades, retratos y
+            naturaleza.
           </p>
         </div>
 
@@ -43,7 +52,7 @@ const Portfolio = () => {
               className="relative overflow-hidden rounded-lg aspect-square group cursor-pointer"
             >
               <img
-                src={`/.jpg?height=400&width=400&query=${encodeURIComponent(photo.query)}`}
+                src={photo.src}
                 alt={photo.alt}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
@@ -64,7 +73,10 @@ const Portfolio = () => {
           className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
           onClick={() => setSelectedPhoto(null)}
         >
-          <div className="relative max-w-4xl w-full" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="relative max-w-4xl w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               onClick={() => setSelectedPhoto(null)}
               className="absolute -top-12 right-0 text-white hover:text-neutral-300 transition-colors"
@@ -73,7 +85,7 @@ const Portfolio = () => {
               <X size={32} />
             </button>
             <img
-              src={`/.jpg?height=800&width=1200&query=${encodeURIComponent(selectedPhoto.query)}`}
+              src={selectedPhoto.src}
               alt={selectedPhoto.alt}
               className="w-full rounded-lg"
             />
@@ -81,7 +93,7 @@ const Portfolio = () => {
         </div>
       )}
     </section>
-  )
-}
+  );
+};
 
-export default Portfolio
+export default Portfolio;

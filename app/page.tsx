@@ -1,11 +1,11 @@
-"use client"
-import Header from "@/components/header"
-import Hero from "@/components/hero"
-import Portfolio from "@/components/portfolio"
-import About from "@/components/about"
-import Instagram from "@/components/instagram"
-import Contact from "@/components/contact"
-import Footer from "@/components/footer"
+"use client";
+import Header from "@/components/header";
+import Hero from "@/components/hero";
+import Portfolio from "@/components/portfolio";
+import About from "@/components/about";
+import Instagram from "@/components/instagram";
+import Contact from "@/components/contact";
+import Footer from "@/components/footer";
 
 export default function Home() {
   return (
@@ -14,9 +14,9 @@ export default function Home() {
       <Hero />
       <Portfolio />
       <About />
-      <Instagram />
+      {/* <Instagram /> */}
       <Contact />
       <Footer />
     </main>
-  )
+  );
 }

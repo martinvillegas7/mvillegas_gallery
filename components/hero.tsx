@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
 const Hero = () => {
   const scrollToPortfolio = () => {
-    const element = document.querySelector("#portfolio")
-    element?.scrollIntoView({ behavior: "smooth" })
-  }
+    const element = document.querySelector("#portfolio");
+    element?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <section
       id="hero"
       className="relative w-full h-screen bg-neutral-950 overflow-hidden flex items-center justify-center"
       style={{
-        backgroundImage: "url(/placeholder.svg?height=1080&width=1920&query=landscape photography mountains sunset)",
+        backgroundImage: "url(/paisaje-pirineos.jpg)",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
@@ -36,7 +36,7 @@ const Hero = () => {
             Ver mi trabajo
           </button>
           <a
-            href="https://instagram.com/mi_usuario"
+            href="https://instagram.com/mvillegas_gallery"
             target="_blank"
             rel="noopener noreferrer"
             className="px-8 py-3 border-2 border-white text-white font-semibold rounded hover:bg-white hover:text-black transition-all duration-300"
@@ -46,7 +46,7 @@ const Hero = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;

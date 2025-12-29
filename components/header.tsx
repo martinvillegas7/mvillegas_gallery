@@ -1,31 +1,33 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Menu, X } from "lucide-react"
+import { useState } from "react";
+import { Menu, X } from "lucide-react";
 
 const Header = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
     { label: "Inicio", href: "#hero" },
     { label: "Portfolio", href: "#portfolio" },
     { label: "Sobre mí", href: "#about" },
-    { label: "Instagram", href: "#instagram" },
+    // { label: "Instagram", href: "#instagram" },
     { label: "Contacto", href: "#contact" },
-  ]
+  ];
 
   const handleNavClick = (href: string) => {
-    setMobileMenuOpen(false)
-    const element = document.querySelector(href)
-    element?.scrollIntoView({ behavior: "smooth" })
-  }
+    setMobileMenuOpen(false);
+    const element = document.querySelector(href);
+    element?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-neutral-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 md:h-20">
           {/* Logo */}
-          <div className="text-xl md:text-2xl font-bold tracking-tight text-white">Martín Villegas</div>
+          <div className="text-xl md:text-2xl font-bold tracking-tight text-white">
+            Martín Villegas
+          </div>
 
           {/* Desktop Menu */}
           <nav className="hidden md:flex items-center gap-8">
@@ -66,7 +68,7 @@ const Header = () => {
         )}
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
