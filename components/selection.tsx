@@ -9,7 +9,7 @@ interface Photo {
   alt: string;
 }
 
-const Portfolio = () => {
+const Selection = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
 
   const photos: Photo[] = [
@@ -35,7 +35,7 @@ const Portfolio = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight text-white">
-            Portfolio
+            Selección
           </h2>
           <p className="text-neutral-400 text-lg max-w-2xl mx-auto text-balance">
             Una selección de mis fotos favoritas de viajes, ciudades, retratos y
@@ -96,4 +96,5 @@ const Portfolio = () => {
   );
 };
 
-export default Portfolio;
+export default Selection;
+
