@@ -13,9 +13,15 @@ interface CategoryGalleryProps {
   title: string;
   description: string;
   photos: Photo[];
+  loading?: boolean;
 }
 
-const CategoryGallery = ({ title, description, photos }: CategoryGalleryProps) => {
+const CategoryGallery = ({
+  title,
+  description,
+  photos,
+  loading = false,
+}: CategoryGalleryProps) => {
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
 
   return (
@@ -31,7 +37,11 @@ const CategoryGallery = ({ title, description, photos }: CategoryGalleryProps) =
         </div>
 
         {/* Grid */}
-        {photos.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-20">
+            <p className="text-neutral-400 text-lg">Cargando imágenes...</p>
+          </div>
+        ) : photos.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {photos.map((photo) => (
               <button
@@ -92,4 +102,3 @@ const CategoryGallery = ({ title, description, photos }: CategoryGalleryProps) =
 };
 
 export default CategoryGallery;
-
