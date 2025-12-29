@@ -67,7 +67,7 @@ const Header = () => {
           {/* Logo */}
           <button
             onClick={() => router.push("/")}
-            className="text-xl md:text-2xl font-bold tracking-tight text-white hover:text-neutral-300 transition-colors duration-300"
+            className="text-xl md:text-2xl font-bold tracking-tight text-white hover:text-neutral-300 transition-colors duration-300 cursor-pointer"
           >
             Martín Villegas
           </button>
@@ -78,7 +78,7 @@ const Header = () => {
               <button
                 key={item.href}
                 onClick={() => handleNavClick(item.href)}
-                className="text-sm text-neutral-300 hover:text-white transition-colors duration-300"
+                className="text-sm text-neutral-300 hover:text-white transition-colors duration-300 cursor-pointer"
               >
                 {item.label}
               </button>
@@ -88,7 +88,7 @@ const Header = () => {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setPortfolioDropdownOpen(!portfolioDropdownOpen)}
-                className="text-sm text-neutral-300 hover:text-white transition-colors duration-300 flex items-center gap-1"
+                className="text-sm text-neutral-300 hover:text-white transition-colors duration-300 flex items-center gap-1 cursor-pointer"
               >
                 Portfolio
                 <ChevronDown
@@ -108,7 +108,7 @@ const Header = () => {
                         handleNavClick(category.href);
                         setPortfolioDropdownOpen(false);
                       }}
-                      className="block w-full text-left px-4 py-2 text-sm text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors duration-300"
+                      className="block w-full text-left px-4 py-2 text-sm text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors duration-300 cursor-pointer"
                     >
                       {category.label}
                     </button>
@@ -120,7 +120,7 @@ const Header = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-white"
+            className="md:hidden text-white cursor-pointer"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -135,7 +135,7 @@ const Header = () => {
               <button
                 key={item.href}
                 onClick={() => handleNavClick(item.href)}
-                className="block w-full text-left px-4 py-2 text-sm text-neutral-300 hover:text-white hover:bg-neutral-900/50 rounded transition-colors duration-300"
+                className="block w-full text-left px-4 py-2 text-sm text-neutral-300 hover:text-white hover:bg-neutral-900/50 rounded transition-colors duration-300 cursor-pointer"
               >
                 {item.label}
               </button>
@@ -153,7 +153,7 @@ const Header = () => {
                     handleNavClick(category.href);
                     setMobileMenuOpen(false);
                   }}
-                  className="block w-full text-left px-6 py-2 text-sm text-neutral-300 hover:text-white hover:bg-neutral-900/50 rounded transition-colors duration-300"
+                  className="block w-full text-left px-6 py-2 text-sm text-neutral-300 hover:text-white hover:bg-neutral-900/50 rounded transition-colors duration-300 cursor-pointer"
                 >
                   {category.label}
                 </button>
