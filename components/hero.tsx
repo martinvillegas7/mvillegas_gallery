@@ -98,7 +98,7 @@ const Hero = ({
               </div>
               {displayPhotos.slice(1, 3).map((photo, index) => (
                 <div
-                  key={photo?.id ?? index}
+                  key={photo?.src ?? `hero-slot-${index}`}
                   className="min-h-0 rounded-2xl overflow-hidden bg-muted"
                 >
                   {photo && (

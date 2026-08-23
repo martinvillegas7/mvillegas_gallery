@@ -101,7 +101,7 @@ const Selection = () => {
                     {project.photos.length > 0 ? (
                       project.photos.map((photo) => (
                         <button
-                          key={photo.id}
+                          key={photo.src}
                           onClick={() => router.push(`/${project.slug}`)}
                           className="relative overflow-hidden rounded-2xl aspect-[4/5] sm:aspect-[4/3] group cursor-pointer"
                         >
