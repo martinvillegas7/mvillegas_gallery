@@ -13,7 +13,13 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const validCategories = ["naturaleza", "deporte", "paisaje", "selection"];
+  const validCategories = [
+    "naturaleza",
+    "deporte",
+    "retratos",
+    "paisaje",
+    "selection",
+  ];
   if (!validCategories.includes(category)) {
     return NextResponse.json({ error: "Invalid category" }, { status: 400 });
   }
@@ -36,6 +42,7 @@ export async function GET(request: NextRequest) {
         const ext = path.extname(file).toLowerCase();
         return imageExtensions.includes(ext);
       })
+      .sort((a, b) => a.localeCompare(b, "es"))
       .map((file, index) => ({
         id: index + 1,
         src: `/${category}/${file}`,

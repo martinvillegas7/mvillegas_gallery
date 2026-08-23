@@ -1,14 +1,18 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Geist } from "next/font/google"
+import { Inter, Playfair_Display } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
-const geist = Geist({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+})
 
 export const metadata: Metadata = {
   title: "Martín Villegas - Fotógrafo Profesional",
-  description: "Portafolio de fotografía profesional de viajes, ciudades, retratos y naturaleza",
+  description: "Portafolio de fotografía de naturaleza, retratos y deporte de Martín Villegas",
   viewport: {
     width: "device-width",
     initialScale: 1,
@@ -23,7 +27,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={`${geist.className} antialiased`}>
+      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
         {children}
         <Analytics />
       </body>
