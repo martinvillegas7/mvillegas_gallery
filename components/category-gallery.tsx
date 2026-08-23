@@ -87,7 +87,7 @@ const CategoryGallery = ({
         ) : photos.length > 0 ? (
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
             {photos.map((photo, index) => (
-              <ScrollReveal key={photo.id} delay={(index % 6) * 60}>
+              <ScrollReveal key={photo.src} delay={(index % 6) * 60}>
                 <button
                   onClick={() => setSelectedIndex(index)}
                   className="relative overflow-hidden aspect-[3/4] group cursor-pointer w-full"
