@@ -2,67 +2,60 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import ScrollReveal from "@/components/scroll-reveal";
 
 interface Photo {
   id: number;
   src: string;
   alt: string;
-  category: "naturaleza" | "deporte" | "paisaje";
 }
+
+interface CategoryProject {
+  slug: string;
+  title: string;
+  subtitle: string;
+  photos: Photo[];
+}
+
+const categories = [
+  {
+    slug: "naturaleza",
+    title: "Naturaleza",
+    subtitle: "Vida silvestre y paisajes naturales.",
+  },
+  {
+    slug: "retratos",
+    title: "Retratos",
+    subtitle: "Personas y momentos especiales.",
+  },
+  {
+    slug: "deporte",
+    title: "Deporte",
+    subtitle: "Acción, movimiento y emoción.",
+  },
+];
 
 const Selection = () => {
   const router = useRouter();
-  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [projects, setProjects] = useState<CategoryProject[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadImages = async () => {
+    const loadProjects = async () => {
       try {
-        // Cargar imágenes de todas las categorías para determinar a qué categoría pertenece cada imagen de selection
-        const [selectionRes, naturalezaRes, deporteRes, paisajeRes] =
-          await Promise.all([
-            fetch("/api/images?category=selection"),
-            fetch("/api/images?category=naturaleza"),
-            fetch("/api/images?category=deporte"),
-            fetch("/api/images?category=paisaje"),
-          ]);
-
-        const [selectionData, naturalezaData, deporteData, paisajeData] =
-          await Promise.all([
-            selectionRes.json(),
-            naturalezaRes.json(),
-            deporteRes.json(),
-            paisajeRes.json(),
-          ]);
-
-        // Crear mapas de nombres de archivo a categorías
-        const naturalezaFiles = new Set(
-          naturalezaData.images.map((img: Photo) => img.src.split("/").pop())
+        const results = await Promise.all(
+          categories.map(async (cat) => {
+            const res = await fetch(`/api/images?category=${cat.slug}`);
+            const data = await res.json();
+            return {
+              slug: cat.slug,
+              title: cat.title,
+              subtitle: cat.subtitle,
+              photos: (data.images || []).slice(0, 2),
+            };
+          })
         );
-        const deporteFiles = new Set(
-          deporteData.images.map((img: Photo) => img.src.split("/").pop())
-        );
-        const paisajeFiles = new Set(
-          paisajeData.images.map((img: Photo) => img.src.split("/").pop())
-        );
-
-        // Asignar categorías a las imágenes de selection
-        const photosWithCategory = selectionData.images.map((photo: Photo) => {
-          const fileName = photo.src.split("/").pop() || "";
-          let category: "naturaleza" | "deporte" | "paisaje" = "naturaleza";
-
-          if (naturalezaFiles.has(fileName)) {
-            category = "naturaleza";
-          } else if (deporteFiles.has(fileName)) {
-            category = "deporte";
-          } else if (paisajeFiles.has(fileName)) {
-            category = "paisaje";
-          }
-
-          return { ...photo, category };
-        });
-
-        setPhotos(photosWithCategory);
+        setProjects(results);
       } catch (error) {
         console.error("Error loading images:", error);
       } finally {
@@ -70,61 +63,76 @@ const Selection = () => {
       }
     };
 
-    loadImages();
+    loadProjects();
   }, []);
 
-  const handlePhotoClick = (category: string) => {
-    router.push(`/${category}`);
-  };
-
   return (
-    <section
-      id="portfolio"
-      className="w-full bg-neutral-900 py-20 md:py-32 px-4 sm:px-6 lg:px-8"
-    >
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight text-white">
-            Selección
-          </h2>
-          <p className="text-neutral-400 text-lg max-w-2xl mx-auto text-balance">
-            Una selección de mis fotos favoritas de viajes, ciudades, retratos y
-            naturaleza.
-          </p>
-        </div>
+    <section id="portfolio" className="w-full pt-10 pb-16 md:py-20 lg:py-32 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-screen-2xl mx-auto">
+        <ScrollReveal>
+          <div className="text-center mb-16 md:mb-24">
+            <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4 tracking-tight">
+              Proyectos Fotográficos
+            </h2>
+            <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto text-balance">
+              Una selección de mis series favoritas, organizadas por categoría.
+            </p>
+          </div>
+        </ScrollReveal>
 
-        {/* Grid */}
         {loading ? (
           <div className="text-center py-20">
-            <p className="text-neutral-400 text-lg">Cargando imágenes...</p>
-          </div>
-        ) : photos.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {photos.map((photo) => (
-              <button
-                key={photo.id}
-                onClick={() => handlePhotoClick(photo.category)}
-                className="relative overflow-hidden rounded-lg aspect-square group cursor-pointer"
-              >
-                <img
-                  src={photo.src}
-                  alt={photo.alt}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="text-white font-semibold text-sm px-6 py-2 border border-white rounded">
-                    Ver más
-                  </span>
-                </div>
-              </button>
-            ))}
+            <p className="text-muted-foreground text-lg">Cargando imágenes...</p>
           </div>
         ) : (
-          <div className="text-center py-20">
-            <p className="text-neutral-400 text-lg">
-              No hay imágenes disponibles en la selección.
-            </p>
+          <div className="space-y-20 md:space-y-28">
+            {projects.map((project, index) => (
+              <div key={project.slug}>
+                <ScrollReveal delay={index * 80}>
+                  <div className="grid grid-cols-2 gap-3 md:gap-6 mb-6 md:mb-8">
+                    {project.photos.length > 0 ? (
+                      project.photos.map((photo) => (
+                        <button
+                          key={photo.id}
+                          onClick={() => router.push(`/${project.slug}`)}
+                          className="relative overflow-hidden rounded-2xl aspect-[4/5] sm:aspect-[4/3] group cursor-pointer"
+                        >
+                          <img
+                            src={photo.src}
+                            alt={photo.alt}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          />
+                        </button>
+                      ))
+                    ) : (
+                      <>
+                        <div className="bg-secondary rounded-2xl aspect-[4/5] sm:aspect-[4/3]" />
+                        <div className="bg-secondary rounded-2xl aspect-[4/5] sm:aspect-[4/3]" />
+                      </>
+                    )}
+                  </div>
+                </ScrollReveal>
+
+                <ScrollReveal delay={index * 80 + 100}>
+                  <div className="flex flex-col items-center text-center md:flex-row md:items-end md:justify-between md:text-left gap-4">
+                    <div>
+                      <h3 className="font-serif text-2xl md:text-3xl font-bold mb-1">
+                        {project.title}
+                      </h3>
+                      <p className="text-muted-foreground text-sm md:text-base">
+                        {project.subtitle}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => router.push(`/${project.slug}`)}
+                      className="px-8 py-2.5 border border-foreground text-sm rounded-full hover:bg-foreground hover:text-background transition-colors duration-300 cursor-pointer"
+                    >
+                      Ver
+                    </button>
+                  </div>
+                </ScrollReveal>
+              </div>
+            ))}
           </div>
         )}
       </div>

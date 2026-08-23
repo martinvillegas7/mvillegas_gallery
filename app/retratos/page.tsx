@@ -11,14 +11,14 @@ interface Photo {
   alt: string;
 }
 
-export default function PaisajePage() {
+export default function RetratosPage() {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadImages = async () => {
       try {
-        const response = await fetch("/api/images?category=paisaje");
+        const response = await fetch("/api/images?category=retratos");
         const data = await response.json();
         setPhotos(data.images || []);
       } catch (error) {
@@ -35,8 +35,8 @@ export default function PaisajePage() {
     <main className="w-full overflow-hidden">
       <Header />
       <CategoryGallery
-        title="Paisaje"
-        description="Imágenes de paisajes naturales, montañas, valles y escenarios que inspiran."
+        title="Retratos"
+        description="Momentos especiales y miradas sinceras: personas capturadas con autenticidad y emoción."
         photos={photos}
         loading={loading}
       />
