@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { DEFAULT_SITE_CONTENT } from "@/lib/site-content-types";
+import { parseGalleryImages } from "@/lib/gallery-types";
 
 interface Photo {
   id: number;
@@ -29,7 +30,8 @@ const Hero = ({
           categories.map(async (category) => {
             const res = await fetch(`/api/images?category=${category}`);
             const data = await res.json();
-            return (data.images || [])[0] ?? null;
+            const images = parseGalleryImages(data);
+            return images.find((image) => image.isHero) ?? images[0] ?? null;
           })
         );
         setPhotos(results.filter(Boolean) as Photo[]);

@@ -2,6 +2,8 @@ import { del } from "@vercel/blob";
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin, unauthorizedResponse } from "@/lib/auth";
 import { isDeletableImagePath } from "@/lib/images";
+import { isGalleryCategory } from "@/lib/categories";
+import { removeImageFromLayout } from "@/lib/gallery-layout";
 
 export const runtime = "nodejs";
 
@@ -35,6 +37,18 @@ export async function DELETE(request: NextRequest) {
     }
 
     await del(url);
+
+    if (pathname) {
+      const [category] = pathname.split("/");
+      if (isGalleryCategory(category)) {
+        try {
+          await removeImageFromLayout(category, pathname);
+        } catch (error) {
+          console.error("Image deleted but layout could not be updated:", error);
+        }
+      }
+    }
+
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("Error deleting image from Blob:", error);
