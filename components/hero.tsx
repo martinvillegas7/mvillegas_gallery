@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ScrollReveal from "@/components/scroll-reveal";
+import { DEFAULT_SITE_CONTENT } from "@/lib/site-content-types";
 
 interface Photo {
   id: number;
@@ -9,7 +9,15 @@ interface Photo {
   alt: string;
 }
 
-const Hero = () => {
+type HeroProps = {
+  title?: string;
+  subtitle?: string;
+};
+
+const Hero = ({
+  title = DEFAULT_SITE_CONTENT.hero.title,
+  subtitle = DEFAULT_SITE_CONTENT.hero.subtitle,
+}: HeroProps) => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [mounted, setMounted] = useState(false);
 
@@ -57,11 +65,10 @@ const Hero = () => {
               }`}
             >
               <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-5 text-balance leading-tight">
-                Bienvenidos
+                {title}
               </h1>
               <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-8 max-w-md">
-                Fotografía profesional de naturaleza, retrato y deporte. Cada
-                imagen, un momento que no se repite.
+                {subtitle}
               </p>
               <button
                 onClick={scrollToPortfolio}

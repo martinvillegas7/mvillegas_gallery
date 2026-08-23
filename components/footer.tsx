@@ -40,7 +40,7 @@ const Footer = () => {
             Contacto
           </Link>
           <a
-            href="https://instagram.com/mvillegas_gallery"
+            href="https://instagram.com/martinvillegas_ph"
             target="_blank"
             rel="noopener noreferrer"
             className="text-muted-foreground hover:text-foreground transition-colors duration-300"

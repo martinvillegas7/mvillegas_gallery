@@ -35,14 +35,14 @@ const Instagram = () => {
           {instagramPosts.map((post) => (
             <a
               key={post.id}
-              href="https://instagram.com/mvillegas_gallery"
+              href="https://instagram.com/martinvillegas_ph"
               target="_blank"
               rel="noopener noreferrer"
               className="relative overflow-hidden rounded-lg aspect-square group"
             >
               <img
                 src={`/.jpg?height=300&width=300&query=${encodeURIComponent(
-                  post.query
+                  post.query,
                 )}`}
                 alt={`Publicación de Instagram ${post.id}`}
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -55,7 +55,7 @@ const Instagram = () => {
         {/* CTA Button */}
         <div className="flex justify-center">
           <a
-            href="https://instagram.com/mvillegas_gallery"
+            href="https://instagram.com/martinvillegas_ph"
             target="_blank"
             rel="noopener noreferrer"
             className="px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300 transform hover:scale-105"
