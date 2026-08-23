@@ -3,8 +3,20 @@
 import type React from "react";
 
 import { useState } from "react";
+import {
+  DEFAULT_SITE_CONTENT,
+  type ExtraSocial,
+} from "@/lib/site-content-types";
 
-const Contact = () => {
+type ContactProps = {
+  email?: string;
+  extraSocials?: ExtraSocial[];
+};
+
+const Contact = ({
+  email = DEFAULT_SITE_CONTENT.contact.email,
+  extraSocials = [],
+}: ContactProps) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -46,11 +58,26 @@ const Contact = () => {
               y hablamos de tu proyecto.
             </p>
             <a
-              href="mailto:mvillegasgallery@gmail.com"
+              href={`mailto:${email}`}
               className="font-serif text-lg md:text-xl hover:opacity-70 transition-opacity"
             >
-              mvillegasgallery@gmail.com
+              {email}
             </a>
+            {extraSocials.length > 0 ? (
+              <div className="mt-6 space-y-2">
+                {extraSocials.map((social) => (
+                  <a
+                    key={`${social.name}-${social.url}`}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {social.name}
+                  </a>
+                ))}
+              </div>
+            ) : null}
           </div>
 
           <div>

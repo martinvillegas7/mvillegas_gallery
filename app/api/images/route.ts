@@ -1,61 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { isGalleryCategory } from "@/lib/categories";
+import { listCategoryImages } from "@/lib/images";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const category = searchParams.get("category");
+  const category = request.nextUrl.searchParams.get("category");
 
   if (!category) {
     return NextResponse.json(
-      { error: "Category parameter is required" },
+      { error: "El parámetro category es obligatorio" },
       { status: 400 }
     );
   }
 
-  const validCategories = [
-    "naturaleza",
-    "deporte",
-    "retratos",
-    "paisaje",
-    "selection",
-  ];
-  if (!validCategories.includes(category)) {
-    return NextResponse.json({ error: "Invalid category" }, { status: 400 });
+  if (!isGalleryCategory(category)) {
+    return NextResponse.json({ error: "Categoría no válida" }, { status: 400 });
   }
 
   try {
-    const publicPath = path.join(process.cwd(), "public", category);
-
-    // Verificar si la carpeta existe
-    if (!fs.existsSync(publicPath)) {
-      return NextResponse.json({ images: [] });
-    }
-
-    // Leer los archivos de la carpeta
-    const files = fs.readdirSync(publicPath);
-
-    // Filtrar solo archivos de imagen
-    const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
-    const images = files
-      .filter((file) => {
-        const ext = path.extname(file).toLowerCase();
-        return imageExtensions.includes(ext);
-      })
-      .sort((a, b) => a.localeCompare(b, "es"))
-      .map((file, index) => ({
-        id: index + 1,
-        src: `/${category}/${file}`,
-        alt: file.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
-      }));
-
-    return NextResponse.json({ images });
-  } catch (error) {
-    console.error("Error reading images:", error);
+    const images = await listCategoryImages(category);
     return NextResponse.json(
-      { error: "Failed to read images" },
+      { images },
+      {
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Error listing images from Blob:", error);
+    return NextResponse.json(
+      {
+        error:
+          "No se pudieron leer las imágenes. Comprueba que BLOB_READ_WRITE_TOKEN esté configurada.",
+      },
       { status: 500 }
     );
   }
 }
-
