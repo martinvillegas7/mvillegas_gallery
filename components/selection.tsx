@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ScrollReveal from "@/components/scroll-reveal";
+import { parseGalleryImages } from "@/lib/gallery-types";
 
 interface Photo {
   id: number;
@@ -47,11 +48,18 @@ const Selection = () => {
           categories.map(async (cat) => {
             const res = await fetch(`/api/images?category=${cat.slug}`);
             const data = await res.json();
+            const images = parseGalleryImages(data);
+            const homePhotos = images
+              .filter((image) => image.isHome)
+              .sort((a, b) => (a.homeIndex ?? 0) - (b.homeIndex ?? 0));
             return {
               slug: cat.slug,
               title: cat.title,
               subtitle: cat.subtitle,
-              photos: (data.images || []).slice(0, 2),
+              photos:
+                homePhotos.length > 0
+                  ? homePhotos.slice(0, 2)
+                  : images.slice(0, 2),
             };
           })
         );
