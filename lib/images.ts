@@ -4,8 +4,12 @@ import {
   type GalleryCategory,
   isGalleryCategory,
 } from "@/lib/categories";
-import type { CategoryLayout, GalleryImage } from "@/lib/gallery-types";
-import { emptyCategoryLayout } from "@/lib/gallery-types";
+import {
+  DEFAULT_FOCAL_POINT,
+  emptyCategoryLayout,
+  type CategoryLayout,
+  type GalleryImage,
+} from "@/lib/gallery-types";
 import { getGalleryLayout } from "@/lib/gallery-layout";
 
 export type { GalleryImage };
@@ -52,6 +56,8 @@ function applyLayout(
       isHero: layout.hero === blob.pathname,
       isHome: homeIndex >= 0,
       homeIndex: homeIndex >= 0 ? homeIndex : null,
+      focalPoint: layout.focalPoints[blob.pathname] ?? DEFAULT_FOCAL_POINT,
+      tags: layout.tags?.[blob.pathname] ?? [],
     };
   });
 }

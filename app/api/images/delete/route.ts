@@ -4,6 +4,7 @@ import { requireAdmin, unauthorizedResponse } from "@/lib/auth";
 import { isDeletableImagePath } from "@/lib/images";
 import { isGalleryCategory } from "@/lib/categories";
 import { removeImageFromLayout } from "@/lib/gallery-layout";
+import { unregisterImageHashes } from "@/lib/gallery-hashes-store";
 
 export const runtime = "nodejs";
 
@@ -43,6 +44,7 @@ export async function DELETE(request: NextRequest) {
       if (isGalleryCategory(category)) {
         try {
           await removeImageFromLayout(category, pathname);
+          await unregisterImageHashes(pathname);
         } catch (error) {
           console.error("Image deleted but layout could not be updated:", error);
         }

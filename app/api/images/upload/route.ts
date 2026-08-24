@@ -4,6 +4,12 @@ import { requireAdmin, unauthorizedResponse } from "@/lib/auth";
 import { isGalleryCategory } from "@/lib/categories";
 import { slugifyFilename } from "@/lib/slugify";
 import { appendImageToLayout } from "@/lib/gallery-layout";
+import { isSha256Hex } from "@/lib/file-hash";
+import {
+  findContentDuplicate,
+  registerImageHashes,
+  sha256Buffer,
+} from "@/lib/gallery-hashes-store";
 
 export const runtime = "nodejs";
 
@@ -62,10 +68,31 @@ export async function POST(request: NextRequest) {
         ? originalNameValue
         : file.name;
 
+    const originalHashValue = formData.get("originalHash");
+    const originalHash =
+      typeof originalHashValue === "string" && isSha256Hex(originalHashValue)
+        ? originalHashValue
+        : null;
+
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    const blobHash = sha256Buffer(fileBuffer);
+
+    const duplicate = await findContentDuplicate(originalHash, blobHash);
+    if (duplicate) {
+      return NextResponse.json(
+        {
+          error: "Esta foto ya está en la galería y no se ha vuelto a subir.",
+          duplicate: true,
+          pathname: duplicate.pathname,
+        },
+        { status: 409 }
+      );
+    }
+
     const slug = slugifyFilename(originalName);
     const pathname = `${categoryValue}/${slug}-${Date.now()}.jpg`;
 
-    const blob = await put(pathname, file, {
+    const blob = await put(pathname, fileBuffer, {
       access: "public",
       addRandomSuffix: false,
       contentType: "image/jpeg",
@@ -99,6 +126,11 @@ export async function POST(request: NextRequest) {
         blob.pathname,
         pathnamesOldestFirst
       );
+      await registerImageHashes({
+        pathname: blob.pathname,
+        originalHash,
+        blobHash,
+      });
     } catch (error) {
       console.error("Image uploaded but layout could not be updated:", error);
     }

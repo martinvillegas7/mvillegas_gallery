@@ -4,23 +4,18 @@ import { useEffect, useState } from "react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import CategoryGallery from "@/components/category-gallery";
-
-interface Photo {
-  id: number;
-  src: string;
-  alt: string;
-}
+import { parseGalleryImages, type GalleryImage } from "@/lib/gallery-types";
 
 export default function NaturalezaPage() {
-  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [photos, setPhotos] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadImages = async () => {
       try {
         const response = await fetch("/api/images?category=naturaleza");
-        const data = await response.json();
-        setPhotos(data.images || []);
+        const data: unknown = await response.json();
+        setPhotos(parseGalleryImages(data));
       } catch (error) {
         console.error("Error loading images:", error);
       } finally {

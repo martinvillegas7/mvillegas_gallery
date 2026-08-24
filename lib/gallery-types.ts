@@ -5,6 +5,13 @@ import {
 
 export const MAX_HOME_IMAGES = 2;
 
+export type FocalPoint = {
+  x: number;
+  y: number;
+};
+
+export const DEFAULT_FOCAL_POINT: FocalPoint = { x: 50, y: 50 };
+
 export type GalleryImage = {
   id: number;
   src: string;
@@ -14,18 +21,22 @@ export type GalleryImage = {
   isHero: boolean;
   isHome: boolean;
   homeIndex: number | null;
+  focalPoint: FocalPoint;
+  tags: string[];
 };
 
 export type CategoryLayout = {
   order: string[];
   hero: string | null;
   home: string[];
+  focalPoints: Record<string, FocalPoint>;
+  tags: Record<string, string[]>;
 };
 
 export type GalleryLayout = Record<GalleryCategory, CategoryLayout>;
 
 export function emptyCategoryLayout(): CategoryLayout {
-  return { order: [], hero: null, home: [] };
+  return { order: [], hero: null, home: [], focalPoints: {}, tags: {} };
 }
 
 export function emptyGalleryLayout(): GalleryLayout {
@@ -38,6 +49,111 @@ export function emptyGalleryLayout(): GalleryLayout {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+export function clampFocalPoint(point: FocalPoint): FocalPoint {
+  return {
+    x: Math.min(100, Math.max(0, point.x)),
+    y: Math.min(100, Math.max(0, point.y)),
+  };
+}
+
+export function parseFocalPoint(value: unknown): FocalPoint {
+  if (!isRecord(value)) {
+    return DEFAULT_FOCAL_POINT;
+  }
+
+  const x = typeof value.x === "number" && Number.isFinite(value.x) ? value.x : 50;
+  const y = typeof value.y === "number" && Number.isFinite(value.y) ? value.y : 50;
+  return clampFocalPoint({ x, y });
+}
+
+export function parseFocalPoints(value: unknown): Record<string, FocalPoint> {
+  if (!isRecord(value)) {
+    return {};
+  }
+
+  const result: Record<string, FocalPoint> = {};
+  for (const [pathname, point] of Object.entries(value)) {
+    result[pathname] = parseFocalPoint(point);
+  }
+  return result;
+}
+
+export function normalizeTag(value: string): string {
+  return value.trim().replace(/\s+/g, " ");
+}
+
+export function tagKey(value: string): string {
+  return normalizeTag(value).toLocaleLowerCase("es");
+}
+
+export function parseTags(value: unknown): string[] {
+  const raw = asStringArray(value)
+    .map(normalizeTag)
+    .filter(Boolean);
+
+  const seen = new Set<string>();
+  const tags: string[] = [];
+  for (const tag of raw) {
+    const key = tagKey(tag);
+    if (seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    tags.push(tag);
+  }
+  return tags;
+}
+
+export function parseTagsMap(value: unknown): Record<string, string[]> {
+  if (!isRecord(value)) {
+    return {};
+  }
+
+  const result: Record<string, string[]> = {};
+  for (const [pathname, tags] of Object.entries(value)) {
+    result[pathname] = parseTags(tags);
+  }
+  return result;
+}
+
+export function uniquePhotoTags(photos: Array<{ tags: string[] }>): string[] {
+  const seen = new Set<string>();
+  const tags: string[] = [];
+  for (const photo of photos) {
+    for (const tag of photo.tags ?? []) {
+      const key = tagKey(tag);
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      tags.push(tag);
+    }
+  }
+  return tags.sort((a, b) => a.localeCompare(b, "es"));
+}
+
+export function canonicalTag(value: string, existing: string[]): string | null {
+  const normalized = normalizeTag(value);
+  if (!normalized) {
+    return null;
+  }
+
+  const key = tagKey(normalized);
+  return existing.find((tag) => tagKey(tag) === key) ?? normalized;
+}
+
+export function photoHasTag(photo: { tags: string[] }, selected: string): boolean {
+  const key = tagKey(selected);
+  return photo.tags.some((tag) => tagKey(tag) === key);
+}
+
+export function focalPointStyle(
+  point: FocalPoint | undefined
+): { objectPosition: string } {
+  const { x, y } = point ?? DEFAULT_FOCAL_POINT;
+  return { objectPosition: `${x}% ${y}%` };
 }
 
 function asStringArray(value: unknown): string[] {
@@ -62,6 +178,8 @@ export function parseCategoryLayout(value: unknown): CategoryLayout {
     order: asStringArray(value.order),
     hero,
     home,
+    focalPoints: parseFocalPoints(value.focalPoints),
+    tags: parseTagsMap(value.tags),
   };
 }
 
@@ -105,6 +223,8 @@ export function parseGalleryImages(value: unknown): GalleryImage[] {
         isHero: item.isHero === true,
         isHome: item.isHome === true,
         homeIndex: typeof item.homeIndex === "number" ? item.homeIndex : null,
+        focalPoint: parseFocalPoint(item.focalPoint),
+        tags: parseTags(item.tags),
       },
     ];
   });
@@ -114,10 +234,14 @@ export function removePathFromLayout(
   layout: CategoryLayout,
   pathname: string
 ): CategoryLayout {
+  const { [pathname]: _removed, ...focalPoints } = layout.focalPoints;
+  const { [pathname]: _removedTags, ...tags } = layout.tags;
   return {
     order: layout.order.filter((item) => item !== pathname),
     hero: layout.hero === pathname ? null : layout.hero,
     home: layout.home.filter((item) => item !== pathname),
+    focalPoints,
+    tags,
   };
 }
 

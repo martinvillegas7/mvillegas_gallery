@@ -3,19 +3,17 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ScrollReveal from "@/components/scroll-reveal";
-import { parseGalleryImages } from "@/lib/gallery-types";
-
-interface Photo {
-  id: number;
-  src: string;
-  alt: string;
-}
+import {
+  focalPointStyle,
+  parseGalleryImages,
+  type GalleryImage,
+} from "@/lib/gallery-types";
 
 interface CategoryProject {
   slug: string;
   title: string;
   subtitle: string;
-  photos: Photo[];
+  photos: GalleryImage[];
 }
 
 const categories = [
@@ -109,6 +107,7 @@ const Selection = () => {
                             src={photo.src}
                             alt={photo.alt}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            style={focalPointStyle(photo.focalPoint)}
                           />
                         </button>
                       ))

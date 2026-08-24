@@ -2,13 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { DEFAULT_SITE_CONTENT } from "@/lib/site-content-types";
-import { parseGalleryImages } from "@/lib/gallery-types";
-
-interface Photo {
-  id: number;
-  src: string;
-  alt: string;
-}
+import {
+  focalPointStyle,
+  parseGalleryImages,
+  type GalleryImage,
+} from "@/lib/gallery-types";
 
 type HeroProps = {
   title?: string;
@@ -19,7 +17,7 @@ const Hero = ({
   title = DEFAULT_SITE_CONTENT.hero.title,
   subtitle = DEFAULT_SITE_CONTENT.hero.subtitle,
 }: HeroProps) => {
-  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [photos, setPhotos] = useState<(GalleryImage | null)[]>([]);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -34,7 +32,7 @@ const Hero = ({
             return images.find((image) => image.isHero) ?? images[0] ?? null;
           })
         );
-        setPhotos(results.filter(Boolean) as Photo[]);
+        setPhotos(results.filter((photo): photo is GalleryImage => photo !== null));
       } catch (error) {
         console.error("Error loading hero images:", error);
       }
@@ -49,7 +47,7 @@ const Hero = ({
   };
 
   const displayPhotos =
-    photos.length > 0 ? photos : [null, null, null] as (Photo | null)[];
+    photos.length > 0 ? photos : ([null, null, null] as (GalleryImage | null)[]);
 
   return (
     <section
@@ -93,6 +91,7 @@ const Hero = ({
                     src={displayPhotos[0].src}
                     alt={displayPhotos[0].alt}
                     className="w-full h-full object-cover"
+                    style={focalPointStyle(displayPhotos[0].focalPoint)}
                   />
                 )}
               </div>
@@ -106,6 +105,7 @@ const Hero = ({
                       src={photo.src}
                       alt={photo.alt}
                       className="w-full h-full object-cover"
+                      style={focalPointStyle(photo.focalPoint)}
                     />
                   )}
                 </div>
