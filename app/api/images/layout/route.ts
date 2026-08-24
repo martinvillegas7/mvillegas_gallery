@@ -70,6 +70,11 @@ export async function PUT(request: NextRequest) {
           order.includes(pathname)
         )
       ),
+      tags: Object.fromEntries(
+        Object.entries(parsed.tags).filter(
+          ([pathname, tags]) => order.includes(pathname) && tags.length > 0
+        )
+      ),
     };
     await saveGalleryLayout(layout);
 

@@ -1,15 +1,22 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import ScrollReveal from "@/components/scroll-reveal";
-import { focalPointStyle, type FocalPoint } from "@/lib/gallery-types";
+import {
+  focalPointStyle,
+  photoHasTag,
+  uniquePhotoTags,
+  tagKey,
+  type FocalPoint,
+} from "@/lib/gallery-types";
 
 interface Photo {
   id: number;
   src: string;
   alt: string;
   focalPoint?: FocalPoint;
+  tags?: string[];
 }
 
 interface CategoryGalleryProps {
@@ -26,27 +33,49 @@ const CategoryGallery = ({
   loading = false,
 }: CategoryGalleryProps) => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [activeTag, setActiveTag] = useState<string | null>(null);
+
+  const availableTags = useMemo(
+    () =>
+      uniquePhotoTags(photos.map((photo) => ({ tags: photo.tags ?? [] }))).filter(
+        (tag) => tagKey(tag) !== "todos"
+      ),
+    [photos]
+  );
+
+  const visiblePhotos = useMemo(() => {
+    if (!activeTag) {
+      return photos;
+    }
+    return photos.filter((photo) =>
+      photoHasTag({ tags: photo.tags ?? [] }, activeTag)
+    );
+  }, [photos, activeTag]);
 
   const selectedPhoto =
-    selectedIndex !== null ? photos[selectedIndex] ?? null : null;
+    selectedIndex !== null ? visiblePhotos[selectedIndex] ?? null : null;
 
   const goToPrevious = useCallback(() => {
     setSelectedIndex((current) => {
-      if (current === null || photos.length === 0) return current;
-      return (current - 1 + photos.length) % photos.length;
+      if (current === null || visiblePhotos.length === 0) return current;
+      return (current - 1 + visiblePhotos.length) % visiblePhotos.length;
     });
-  }, [photos.length]);
+  }, [visiblePhotos.length]);
 
   const goToNext = useCallback(() => {
     setSelectedIndex((current) => {
-      if (current === null || photos.length === 0) return current;
-      return (current + 1) % photos.length;
+      if (current === null || visiblePhotos.length === 0) return current;
+      return (current + 1) % visiblePhotos.length;
     });
-  }, [photos.length]);
+  }, [visiblePhotos.length]);
 
   const closeLightbox = useCallback(() => {
     setSelectedIndex(null);
   }, []);
+
+  useEffect(() => {
+    setSelectedIndex(null);
+  }, [activeTag]);
 
   useEffect(() => {
     if (selectedIndex === null) return;
@@ -68,6 +97,8 @@ const CategoryGallery = ({
     };
   }, [selectedIndex, closeLightbox, goToPrevious, goToNext]);
 
+  const filters = ["Todos", ...availableTags];
+
   return (
     <section className="w-full pt-28 md:pt-32 pb-20 md:pb-32 px-4 sm:px-6 lg:px-8 min-h-screen">
       <div className="max-w-screen-2xl mx-auto">
@@ -79,6 +110,32 @@ const CategoryGallery = ({
             <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto text-balance">
               {description}
             </p>
+            {!loading && availableTags.length > 0 ? (
+              <div
+                className="flex flex-wrap justify-center gap-2 mt-8"
+                aria-label="Filtrar fotografías"
+              >
+                {filters.map((label) => {
+                  const value = label === "Todos" ? null : label;
+                  const isActive = activeTag === value;
+                  return (
+                    <button
+                      key={label}
+                      type="button"
+                      aria-pressed={isActive}
+                      onClick={() => setActiveTag(value)}
+                      className={`px-4 py-1.5 rounded-full text-sm tracking-wide border transition-colors duration-300 cursor-pointer ${
+                        isActive
+                          ? "bg-foreground text-background border-foreground"
+                          : "border-border text-muted-foreground hover:text-foreground hover:border-foreground"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
           </div>
         </ScrollReveal>
 
@@ -87,23 +144,31 @@ const CategoryGallery = ({
             <p className="text-muted-foreground text-lg">Cargando imágenes...</p>
           </div>
         ) : photos.length > 0 ? (
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
-            {photos.map((photo, index) => (
-              <ScrollReveal key={photo.src} delay={(index % 6) * 60}>
-                <button
-                  onClick={() => setSelectedIndex(index)}
-                  className="relative overflow-hidden aspect-[3/4] group cursor-pointer w-full"
-                >
-                  <img
-                    src={photo.src}
-                    alt={photo.alt}
-                    className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-90"
-                    style={focalPointStyle(photo.focalPoint)}
-                  />
-                </button>
-              </ScrollReveal>
-            ))}
-          </div>
+          visiblePhotos.length > 0 ? (
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
+              {visiblePhotos.map((photo, index) => (
+                <ScrollReveal key={photo.src} delay={(index % 6) * 60}>
+                  <button
+                    onClick={() => setSelectedIndex(index)}
+                    className="relative overflow-hidden aspect-[3/4] group cursor-pointer w-full"
+                  >
+                    <img
+                      src={photo.src}
+                      alt={photo.alt}
+                      className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-90"
+                      style={focalPointStyle(photo.focalPoint)}
+                    />
+                  </button>
+                </ScrollReveal>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20">
+              <p className="text-muted-foreground text-lg">
+                No hay fotografías con esta etiqueta.
+              </p>
+            </div>
+          )
         ) : (
           <div className="text-center py-20">
             <p className="text-muted-foreground text-lg">
@@ -129,7 +194,7 @@ const CategoryGallery = ({
             <X size={32} strokeWidth={1.5} />
           </button>
 
-          {photos.length > 1 && (
+          {visiblePhotos.length > 1 && (
             <>
               <button
                 onClick={(event) => {

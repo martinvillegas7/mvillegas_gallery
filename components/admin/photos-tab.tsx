@@ -8,6 +8,7 @@ import {
   Crosshair,
   House,
   Star,
+  Tags,
   Trash2,
   Upload,
 } from "lucide-react";
@@ -20,9 +21,11 @@ import {
   focalPointStyle,
   MAX_HOME_IMAGES,
   parseGalleryImages,
+  uniquePhotoTags,
   type GalleryImage,
 } from "@/lib/gallery-types";
 import FocalPointEditor from "@/components/admin/focal-point-editor";
+import TagsEditor from "@/components/admin/tags-editor";
 import { sha256Blob } from "@/lib/file-hash";
 import { parseKnownHashes } from "@/lib/gallery-hashes";
 import { adminFetch, readApiError } from "@/components/admin/session";
@@ -94,6 +97,7 @@ export default function PhotosTab() {
   const [dragFrom, setDragFrom] = useState<number | null>(null);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [focalImage, setFocalImage] = useState<GalleryImage | null>(null);
+  const [tagsImage, setTagsImage] = useState<GalleryImage | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const imagesRef = useRef<GalleryImage[]>([]);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -152,6 +156,9 @@ export default function PhotosTab() {
             .map((image) => image.pathname),
           focalPoints: Object.fromEntries(
             nextImages.map((image) => [image.pathname, image.focalPoint])
+          ),
+          tags: Object.fromEntries(
+            nextImages.map((image) => [image.pathname, image.tags ?? []])
           ),
         }),
       });
@@ -533,8 +540,9 @@ export default function PhotosTab() {
         </h2>
         <p className="text-sm text-muted-foreground mb-4">
           Arrastra las tarjetas para ver cómo queda el orden antes de soltar.
-          La mira ajusta qué parte se ve en la miniatura. Estrella = Bienvenidos.
-          Casa = Proyectos en el inicio (máximo {MAX_HOME_IMAGES}).
+          La mira ajusta qué parte se ve en la miniatura. Etiquetas = filtros de
+          la galería. Estrella = Bienvenidos. Casa = Proyectos en el inicio
+          (máximo {MAX_HOME_IMAGES}).
         </p>
         {saving ? (
           <p className="text-sm text-muted-foreground mb-3">Guardando...</p>
@@ -658,6 +666,23 @@ export default function PhotosTab() {
                   <button
                     type="button"
                     onPointerDown={(event) => event.stopPropagation()}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setTagsImage(image);
+                    }}
+                    className={`bg-black/60 cursor-pointer rounded-full p-1.5 ${
+                      image.tags?.length
+                        ? "text-white"
+                        : "text-white/80 hover:text-white"
+                    }`}
+                    aria-label={`Etiquetas de ${image.alt}`}
+                    title="Etiquetas"
+                  >
+                    <Tags size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    onPointerDown={(event) => event.stopPropagation()}
                     onClick={() => void handleDelete(image)}
                     disabled={deletingUrl === image.url}
                     className="bg-black/60 text-white hover:text-red-300 disabled:opacity-50 cursor-pointer rounded-full p-1.5"
@@ -671,6 +696,11 @@ export default function PhotosTab() {
                   onPointerDown={(event) => event.stopPropagation()}
                 >
                   <p className="text-white text-xs truncate">{image.alt}</p>
+                  {image.tags?.length ? (
+                    <p className="text-white/75 text-[10px] truncate">
+                      {image.tags.join(" · ")}
+                    </p>
+                  ) : null}
                   <div className="flex items-center justify-between gap-1">
                     <div className="flex gap-1">
                       <button
@@ -755,6 +785,25 @@ export default function PhotosTab() {
           }}
           onClose={() => {
             setFocalImage(null);
+            void persistLayout(imagesRef.current);
+          }}
+        />
+      ) : null}
+      {tagsImage ? (
+        <TagsEditor
+          image={
+            images.find((item) => item.url === tagsImage.url) ?? tagsImage
+          }
+          suggestedTags={uniquePhotoTags(images)}
+          onChange={(tags) => {
+            setImages((current) =>
+              current.map((item) =>
+                item.url === tagsImage.url ? { ...item, tags } : item
+              )
+            );
+          }}
+          onClose={() => {
+            setTagsImage(null);
             void persistLayout(imagesRef.current);
           }}
         />

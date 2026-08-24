@@ -57,6 +57,7 @@ function applyLayout(
       isHome: homeIndex >= 0,
       homeIndex: homeIndex >= 0 ? homeIndex : null,
       focalPoint: layout.focalPoints[blob.pathname] ?? DEFAULT_FOCAL_POINT,
+      tags: layout.tags?.[blob.pathname] ?? [],
     };
   });
 }
