@@ -61,7 +61,16 @@ export async function PUT(request: NextRequest) {
         : null;
 
     const layout = await getGalleryLayout();
-    layout[category] = { order, hero, home };
+    layout[category] = {
+      order,
+      hero,
+      home,
+      focalPoints: Object.fromEntries(
+        Object.entries(parsed.focalPoints).filter(([pathname]) =>
+          order.includes(pathname)
+        )
+      ),
+    };
     await saveGalleryLayout(layout);
 
     return NextResponse.json(layout[body.category]);

@@ -3,11 +3,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import ScrollReveal from "@/components/scroll-reveal";
+import { focalPointStyle, type FocalPoint } from "@/lib/gallery-types";
 
 interface Photo {
   id: number;
   src: string;
   alt: string;
+  focalPoint?: FocalPoint;
 }
 
 interface CategoryGalleryProps {
@@ -96,6 +98,7 @@ const CategoryGallery = ({
                     src={photo.src}
                     alt={photo.alt}
                     className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-90"
+                    style={focalPointStyle(photo.focalPoint)}
                   />
                 </button>
               </ScrollReveal>
