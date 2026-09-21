@@ -1,5 +1,9 @@
-import { list, put } from "@vercel/blob";
-import { unstable_noStore as noStore } from "next/cache";
+import { put } from "@vercel/blob";
+import { fetchBlobJson } from "@/lib/blob-json";
+import {
+  SITE_CONTENT_CACHE_TAG,
+  revalidateSiteContentCache,
+} from "@/lib/gallery-cache";
 import {
   DEFAULT_SITE_CONTENT,
   mergeSiteContent,
@@ -16,31 +20,19 @@ export {
 
 export const SITE_CONTENT_PATH = "site-content.json";
 
-export async function getSiteContent(): Promise<SiteContent> {
-  noStore();
+export async function getSiteContent(options?: {
+  fresh?: boolean;
+}): Promise<SiteContent> {
+  const data = await fetchBlobJson(SITE_CONTENT_PATH, {
+    fresh: options?.fresh,
+    tag: SITE_CONTENT_CACHE_TAG,
+  });
 
-  try {
-    const { blobs } = await list({
-      prefix: SITE_CONTENT_PATH,
-      limit: 10,
-    });
-
-    const blob = blobs.find((item) => item.pathname === SITE_CONTENT_PATH);
-    if (!blob) {
-      return DEFAULT_SITE_CONTENT;
-    }
-
-    const response = await fetch(blob.url, { cache: "no-store" });
-    if (!response.ok) {
-      return DEFAULT_SITE_CONTENT;
-    }
-
-    const data: unknown = await response.json();
-    return mergeSiteContent(data);
-  } catch (error) {
-    console.error("Error reading site content from Blob:", error);
+  if (data == null) {
     return DEFAULT_SITE_CONTENT;
   }
+
+  return mergeSiteContent(data);
 }
 
 export async function saveSiteContent(content: SiteContent): Promise<void> {
@@ -50,4 +42,5 @@ export async function saveSiteContent(content: SiteContent): Promise<void> {
     allowOverwrite: true,
     contentType: "application/json",
   });
+  revalidateSiteContentCache();
 }

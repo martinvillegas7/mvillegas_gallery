@@ -31,12 +31,20 @@ export type CategoryLayout = {
   home: string[];
   focalPoints: Record<string, FocalPoint>;
   tags: Record<string, string[]>;
+  urls: Record<string, string>;
 };
 
 export type GalleryLayout = Record<GalleryCategory, CategoryLayout>;
 
 export function emptyCategoryLayout(): CategoryLayout {
-  return { order: [], hero: null, home: [], focalPoints: {}, tags: {} };
+  return {
+    order: [],
+    hero: null,
+    home: [],
+    focalPoints: {},
+    tags: {},
+    urls: {},
+  };
 }
 
 export function emptyGalleryLayout(): GalleryLayout {
@@ -118,6 +126,20 @@ export function parseTagsMap(value: unknown): Record<string, string[]> {
   return result;
 }
 
+export function parseUrlMap(value: unknown): Record<string, string> {
+  if (!isRecord(value)) {
+    return {};
+  }
+
+  const result: Record<string, string> = {};
+  for (const [pathname, url] of Object.entries(value)) {
+    if (typeof url === "string" && url.trim()) {
+      result[pathname] = url.trim();
+    }
+  }
+  return result;
+}
+
 export function uniquePhotoTags(photos: Array<{ tags: string[] }>): string[] {
   const seen = new Set<string>();
   const tags: string[] = [];
@@ -180,6 +202,7 @@ export function parseCategoryLayout(value: unknown): CategoryLayout {
     home,
     focalPoints: parseFocalPoints(value.focalPoints),
     tags: parseTagsMap(value.tags),
+    urls: parseUrlMap(value.urls),
   };
 }
 
@@ -236,24 +259,33 @@ export function removePathFromLayout(
 ): CategoryLayout {
   const { [pathname]: _removed, ...focalPoints } = layout.focalPoints;
   const { [pathname]: _removedTags, ...tags } = layout.tags;
+  const { [pathname]: _removedUrl, ...urls } = layout.urls;
   return {
     order: layout.order.filter((item) => item !== pathname),
     hero: layout.hero === pathname ? null : layout.hero,
     home: layout.home.filter((item) => item !== pathname),
     focalPoints,
     tags,
+    urls,
   };
 }
 
 export function appendPathToLayout(
   layout: CategoryLayout,
-  pathname: string
+  pathname: string,
+  url?: string
 ): CategoryLayout {
+  const urls = url
+    ? { ...layout.urls, [pathname]: url }
+    : layout.urls;
+
   if (layout.order.includes(pathname)) {
-    return layout;
+    return url ? { ...layout, urls } : layout;
   }
+
   return {
     ...layout,
     order: [...layout.order, pathname],
+    urls,
   };
 }

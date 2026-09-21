@@ -60,7 +60,8 @@ export async function PUT(request: NextRequest) {
         ? parsed.hero
         : null;
 
-    const layout = await getGalleryLayout();
+    const layout = await getGalleryLayout({ fresh: true });
+    const previousUrls = layout[category].urls;
     layout[category] = {
       order,
       hero,
@@ -74,6 +75,12 @@ export async function PUT(request: NextRequest) {
         Object.entries(parsed.tags).filter(
           ([pathname, tags]) => order.includes(pathname) && tags.length > 0
         )
+      ),
+      urls: Object.fromEntries(
+        order.flatMap((pathname) => {
+          const url = parsed.urls[pathname] || previousUrls[pathname];
+          return url ? [[pathname, url]] : [];
+        })
       ),
     };
     await saveGalleryLayout(layout);

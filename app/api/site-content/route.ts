@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const content = await getSiteContent();
+    const content = await getSiteContent({ fresh: true });
     return NextResponse.json(content, {
       headers: {
         "Cache-Control": "no-store",

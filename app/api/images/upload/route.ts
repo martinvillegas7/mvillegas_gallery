@@ -1,4 +1,4 @@
-import { list, put } from "@vercel/blob";
+import { put } from "@vercel/blob";
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin, unauthorizedResponse } from "@/lib/auth";
 import { isGalleryCategory } from "@/lib/categories";
@@ -99,33 +99,7 @@ export async function POST(request: NextRequest) {
     });
 
     try {
-      const listed: Array<{ pathname: string; uploadedAt: Date }> = [];
-      let cursor: string | undefined;
-      do {
-        const result = await list({
-          prefix: `${categoryValue}/`,
-          cursor,
-          limit: 1000,
-        });
-        listed.push(
-          ...result.blobs.map((item) => ({
-            pathname: item.pathname,
-            uploadedAt: item.uploadedAt,
-          }))
-        );
-        cursor = result.hasMore ? result.cursor : undefined;
-      } while (cursor);
-
-      const pathnamesOldestFirst = listed
-        .filter((item) => /\.(jpe?g|png|gif|webp)$/i.test(item.pathname))
-        .sort((a, b) => a.uploadedAt.getTime() - b.uploadedAt.getTime())
-        .map((item) => item.pathname);
-
-      await appendImageToLayout(
-        categoryValue,
-        blob.pathname,
-        pathnamesOldestFirst
-      );
+      await appendImageToLayout(categoryValue, blob.pathname, blob.url);
       await registerImageHashes({
         pathname: blob.pathname,
         originalHash,

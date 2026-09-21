@@ -4,41 +4,23 @@ import { useEffect, useState } from "react";
 import { DEFAULT_SITE_CONTENT } from "@/lib/site-content-types";
 import {
   focalPointStyle,
-  parseGalleryImages,
   type GalleryImage,
 } from "@/lib/gallery-types";
 
 type HeroProps = {
   title?: string;
   subtitle?: string;
+  photos?: GalleryImage[];
 };
 
 const Hero = ({
   title = DEFAULT_SITE_CONTENT.hero.title,
   subtitle = DEFAULT_SITE_CONTENT.hero.subtitle,
+  photos = [],
 }: HeroProps) => {
-  const [photos, setPhotos] = useState<(GalleryImage | null)[]>([]);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const loadHeroPhotos = async () => {
-      try {
-        const categories = ["naturaleza", "retratos", "deporte"];
-        const results = await Promise.all(
-          categories.map(async (category) => {
-            const res = await fetch(`/api/images?category=${category}`);
-            const data = await res.json();
-            const images = parseGalleryImages(data);
-            return images.find((image) => image.isHero) ?? images[0] ?? null;
-          })
-        );
-        setPhotos(results.filter((photo): photo is GalleryImage => photo !== null));
-      } catch (error) {
-        console.error("Error loading hero images:", error);
-      }
-    };
-
-    loadHeroPhotos();
     setMounted(true);
   }, []);
 
