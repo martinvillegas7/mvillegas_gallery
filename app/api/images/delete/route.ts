@@ -1,7 +1,7 @@
 import { del } from "@vercel/blob";
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin, unauthorizedResponse } from "@/lib/auth";
-import { isDeletableImagePath } from "@/lib/images";
+import { isDeletableImagePath } from "@/lib/image-paths";
 import { isGalleryCategory } from "@/lib/categories";
 import { removeImageFromLayout } from "@/lib/gallery-layout";
 import { unregisterImageHashes } from "@/lib/gallery-hashes-store";
