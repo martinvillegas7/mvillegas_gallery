@@ -3,7 +3,6 @@ import { getBlobPublicUrl } from "@/lib/blob-public-url";
 import {
   GALLERY_CATEGORIES,
   type GalleryCategory,
-  isGalleryCategory,
 } from "@/lib/categories";
 import {
   DEFAULT_FOCAL_POINT,
@@ -19,13 +18,9 @@ import {
 } from "@/lib/local-gallery";
 
 export type { GalleryImage };
+export { isDeletableImagePath } from "@/lib/image-paths";
 
 const IMAGE_EXTENSIONS = /\.(jpe?g|png|gif|webp)$/i;
-
-export function isDeletableImagePath(pathname: string): boolean {
-  const [category] = pathname.split("/");
-  return Boolean(category && isGalleryCategory(category));
-}
 
 function imagesFromLayout(layout: CategoryLayout): GalleryImage[] {
   const seen = new Set<string>();

@@ -1,5 +1,3 @@
-import { readdir } from "fs/promises";
-import path from "path";
 import {
   GALLERY_CATEGORIES,
   type GalleryCategory,
@@ -10,6 +8,7 @@ import {
   type GalleryImage,
 } from "@/lib/gallery-types";
 import { altFromPathname } from "@/lib/slugify";
+import manifest from "@/lib/local-gallery-manifest.json";
 
 const LOCAL_GALLERY_ROOT = "TEMPORAL";
 
@@ -18,8 +17,6 @@ export const LOCAL_GALLERY_FOLDERS: Record<GalleryCategory, string> = {
   retratos: `${LOCAL_GALLERY_ROOT}/RETRATOS`,
   deporte: `${LOCAL_GALLERY_ROOT}/DEPORTE`,
 };
-
-const IMAGE_EXTENSIONS = /\.(jpe?g|png|gif|webp)$/i;
 
 /** El cupo de Vercel Blob se reinicia el 20/10/2026. */
 const LOCAL_GALLERY_UNTIL = Date.parse("2026-10-20T00:00:00.000Z");
@@ -42,27 +39,16 @@ function publicSrc(folder: string, filename: string): string {
     .join("/")}`;
 }
 
+function filenamesFor(category: GalleryCategory): string[] {
+  const files = (manifest as Record<string, string[]>)[category];
+  return Array.isArray(files) ? files : [];
+}
+
 export async function listLocalCategoryImages(
   category: GalleryCategory
 ): Promise<GalleryImage[]> {
   const folder = LOCAL_GALLERY_FOLDERS[category];
-  const directory = path.join(process.cwd(), "public", folder);
-
-  let files: string[];
-  try {
-    files = await readdir(directory);
-  } catch {
-    return [];
-  }
-
-  const images = files
-    .filter(
-      (name) =>
-        IMAGE_EXTENSIONS.test(name) &&
-        !name.startsWith(".") &&
-        name !== ".gitkeep"
-    )
-    .sort((a, b) => a.localeCompare(b, "es", { numeric: true }));
+  const images = filenamesFor(category);
 
   return images.map((filename, index) => {
     const src = publicSrc(folder, filename);
