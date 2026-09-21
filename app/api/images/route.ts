@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const images = await listCategoryImages(category);
+    const images = await listCategoryImages(category, { fresh: true });
     return NextResponse.json(
       { images },
       {

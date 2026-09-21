@@ -1,30 +1,12 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import CategoryGallery from "@/components/category-gallery";
-import { parseGalleryImages, type GalleryImage } from "@/lib/gallery-types";
+import { listCategoryImages } from "@/lib/images";
 
-export default function NaturalezaPage() {
-  const [photos, setPhotos] = useState<GalleryImage[]>([]);
-  const [loading, setLoading] = useState(true);
+export const revalidate = 300;
 
-  useEffect(() => {
-    const loadImages = async () => {
-      try {
-        const response = await fetch("/api/images?category=naturaleza");
-        const data: unknown = await response.json();
-        setPhotos(parseGalleryImages(data));
-      } catch (error) {
-        console.error("Error loading images:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadImages();
-  }, []);
+export default async function NaturalezaPage() {
+  const photos = await listCategoryImages("naturaleza");
 
   return (
     <main className="w-full overflow-hidden">
@@ -33,7 +15,6 @@ export default function NaturalezaPage() {
         title="Naturaleza"
         description="Fotografías de fauna, flora y vida silvestre capturadas en su hábitat natural."
         photos={photos}
-        loading={loading}
       />
       <Footer />
     </main>

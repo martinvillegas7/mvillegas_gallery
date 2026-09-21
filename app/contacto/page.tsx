@@ -3,6 +3,8 @@ import Footer from "@/components/footer";
 import Contact from "@/components/contact";
 import { getSiteContent } from "@/lib/site-content";
 
+export const revalidate = 300;
+
 export default async function ContactoPage() {
   const content = await getSiteContent();
 

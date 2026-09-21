@@ -1,6 +1,7 @@
-import { list, put } from "@vercel/blob";
-import { unstable_noStore as noStore } from "next/cache";
+import { put } from "@vercel/blob";
 import type { GalleryCategory } from "@/lib/categories";
+import { fetchBlobJson } from "@/lib/blob-json";
+import { GALLERY_CACHE_TAG, revalidateGalleryCache } from "@/lib/gallery-cache";
 import {
   appendPathToLayout,
   emptyGalleryLayout,
@@ -12,31 +13,19 @@ import {
 
 export const GALLERY_LAYOUT_PATH = "gallery-layout.json";
 
-export async function getGalleryLayout(): Promise<GalleryLayout> {
-  noStore();
+export async function getGalleryLayout(options?: {
+  fresh?: boolean;
+}): Promise<GalleryLayout> {
+  const data = await fetchBlobJson(GALLERY_LAYOUT_PATH, {
+    fresh: options?.fresh,
+    tag: GALLERY_CACHE_TAG,
+  });
 
-  try {
-    const { blobs } = await list({
-      prefix: GALLERY_LAYOUT_PATH,
-      limit: 10,
-    });
-
-    const blob = blobs.find((item) => item.pathname === GALLERY_LAYOUT_PATH);
-    if (!blob) {
-      return emptyGalleryLayout();
-    }
-
-    const response = await fetch(blob.url, { cache: "no-store" });
-    if (!response.ok) {
-      return emptyGalleryLayout();
-    }
-
-    const data: unknown = await response.json();
-    return parseGalleryLayout(data);
-  } catch (error) {
-    console.error("Error reading gallery layout from Blob:", error);
+  if (data == null) {
     return emptyGalleryLayout();
   }
+
+  return parseGalleryLayout(data);
 }
 
 export async function saveGalleryLayout(layout: GalleryLayout): Promise<void> {
@@ -46,13 +35,14 @@ export async function saveGalleryLayout(layout: GalleryLayout): Promise<void> {
     allowOverwrite: true,
     contentType: "application/json",
   });
+  revalidateGalleryCache();
 }
 
 export async function updateCategoryLayout(
   category: GalleryCategory,
   updater: (current: CategoryLayout) => CategoryLayout
 ): Promise<GalleryLayout> {
-  const layout = await getGalleryLayout();
+  const layout = await getGalleryLayout({ fresh: true });
   layout[category] = updater(layout[category]);
   await saveGalleryLayout(layout);
   return layout;
@@ -61,21 +51,11 @@ export async function updateCategoryLayout(
 export async function appendImageToLayout(
   category: GalleryCategory,
   pathname: string,
-  allPathnamesOldestFirst: string[]
+  url: string
 ): Promise<void> {
-  await updateCategoryLayout(category, (current) => {
-    if (current.order.length === 0) {
-      const seeded = allPathnamesOldestFirst.filter(
-        (item, index, list) => list.indexOf(item) === index
-      );
-      return {
-        ...current,
-        order: seeded.includes(pathname) ? seeded : [...seeded, pathname],
-      };
-    }
-
-    return appendPathToLayout(current, pathname);
-  });
+  await updateCategoryLayout(category, (current) =>
+    appendPathToLayout(current, pathname, url)
+  );
 }
 
 export async function removeImageFromLayout(

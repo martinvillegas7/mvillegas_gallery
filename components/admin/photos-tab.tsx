@@ -160,6 +160,9 @@ export default function PhotosTab() {
           tags: Object.fromEntries(
             nextImages.map((image) => [image.pathname, image.tags ?? []])
           ),
+          urls: Object.fromEntries(
+            nextImages.map((image) => [image.pathname, image.url])
+          ),
         }),
       });
 
