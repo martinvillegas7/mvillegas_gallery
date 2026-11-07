@@ -11,11 +11,6 @@ import {
   type GalleryImage,
 } from "@/lib/gallery-types";
 import { getGalleryLayout } from "@/lib/gallery-layout";
-import {
-  listAllLocalCategoryImages,
-  listLocalCategoryImages,
-  useLocalGalleryFallback,
-} from "@/lib/local-gallery";
 
 export type { GalleryImage };
 export { isDeletableImagePath } from "@/lib/image-paths";
@@ -56,10 +51,6 @@ export async function listCategoryImages(
   category: GalleryCategory,
   options?: { fresh?: boolean }
 ): Promise<GalleryImage[]> {
-  if (useLocalGalleryFallback()) {
-    return listLocalCategoryImages(category);
-  }
-
   const layout = await getGalleryLayout(options);
   return imagesFromLayout(layout[category] ?? emptyCategoryLayout());
 }
@@ -67,10 +58,6 @@ export async function listCategoryImages(
 export async function listAllCategoryImages(options?: {
   fresh?: boolean;
 }): Promise<Record<GalleryCategory, GalleryImage[]>> {
-  if (useLocalGalleryFallback()) {
-    return listAllLocalCategoryImages();
-  }
-
   const layout = await getGalleryLayout(options);
   return Object.fromEntries(
     GALLERY_CATEGORIES.map((category) => [
