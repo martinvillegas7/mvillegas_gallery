@@ -1,9 +1,4 @@
-import { execSync } from "node:child_process";
 import type { NextConfig } from "next";
-
-execSync("node scripts/generate-local-gallery-manifest.mjs", {
-  stdio: "inherit",
-});
 
 const nextConfig: NextConfig = {
   images: {
@@ -20,7 +15,6 @@ const nextConfig: NextConfig = {
   },
   outputFileTracingExcludes: {
     "*": [
-      "public/TEMPORAL/**",
       "public/naturaleza/**",
       "public/retratos/**",
       "public/deporte/**",
